@@ -17,13 +17,28 @@ end
 # Advent of Code API
 module AoCAPI
   @endpoints = {
-    input: 'https://adventofcode.com/%s/day/%s/input'
-  }
+    input: 'https://adventofcode.com/%s/day/%s/input',
+    answer: 'https://adventofcode.com/%s/day/%s/answer'
+  }.freeze
+
+  def self.uri(endpoint, *args)
+    format(@endpoints[endpoint], *args)
+  end
 
   def self.get(token, endpoint, *args)
-    uri = format(@endpoints[endpoint], *args)
+    get_uri = uri(endpoint, *args)
 
-    RestClient.get(uri, 'Cookie' => "session=#{token}")
+    RestClient.get(get_uri, 'Cookie' => "session=#{token}")
+  end
+
+  def self.post(token, endpoint, *args, body: nil)
+    post_uri = uri(endpoint, *args)
+
+    RestClient.post(post_uri, body, 'Cookie' => "session=#{token}")
+  end
+
+  def self.input(token, year, day)
+    get(token, :input, year, day)
   end
 end
 
@@ -32,22 +47,22 @@ end
 class AoCCLI < Thor
   package_name 'Advent of Code CLI'
 
+  class_option :year, required: false, type: :numeric, aliases: ['-y']
+
   no_commands do
-    def fetch_token
+    def ensure_token
       @token ||= ENV['AOC_SESSION']
       raise 'AoC session token not found' unless @token
     end
   end
 
-  option :year, required: false, type: :numeric, aliases: ['-y']
   desc 'get [DAY]', 'Get input for a day'
   def get(day = nil)
-    fetch_token
-
+    ensure_token
+    @year = options[:year] || Date.today.year
     day ||= Date.today.day
-    year = options[:year] || Date.today.year
 
-    input = AoCAPI.get(@token, :input, year, day)
+    input = AoCAPI.input(@token, @year, day)
     File.write(File.join(folder_path(day), 'input.txt'), input)
   end
 end
