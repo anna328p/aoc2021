@@ -7,3 +7,7 @@
 # Part 1
 
 
+infile = ARGV[0] || 'input.txt'
+input = File.readlines(infile).map(&:to_i)
+
+
