@@ -3,3 +3,5 @@
 source 'https://rubygems.org'
 
 gem 'irb'
+gem 'thor'
+gem 'rest-client'

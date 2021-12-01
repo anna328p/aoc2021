@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+
+# frozen_string_literal: true
+
+require 'thor'
+require 'rest_client'
+
+def pad(day)
+  day.to_s.rjust(2, '0')
+end
+
+def folder_path(day)
+  File.join(__dir__, '..', 'days', pad(day))
+end
+
+##
+# Advent of Code API
+module AoCAPI
+  @endpoints = {
+    input: 'https://adventofcode.com/%s/day/%s/input'
+  }
+
+  def self.get(token, endpoint, *args)
+    uri = format(@endpoints[endpoint], *args)
+
+    RestClient.get(uri, 'Cookie' => "session=#{token}")
+  end
+end
+
+##
+# Advent of Code CLI
+class AoCCLI < Thor
+  package_name 'Advent of Code CLI'
+
+  no_commands do
+    def fetch_token
+      @token ||= ENV['AOC_SESSION']
+      raise 'AoC session token not found' unless @token
+    end
+  end
+
+  option :year, required: false, type: :numeric, aliases: ['-y']
+  desc 'get [DAY]', 'Get input for a day'
+  def get(day = nil)
+    fetch_token
+
+    day ||= Date.today.day
+    year = options[:year] || Date.today.year
+
+    input = AoCAPI.get(@token, :input, year, day)
+    File.write(File.join(folder_path(day), 'input.txt'), input)
+  end
+end
+
+AoCCLI.start(ARGV)
+
+# vim: ft=ruby
