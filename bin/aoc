@@ -4,6 +4,7 @@
 
 require 'thor'
 require 'rest_client'
+require 'tzinfo'
 
 def pad(day)
   day.to_s.rjust(2, '0')
@@ -11,6 +12,12 @@ end
 
 def folder_path(day)
   File.join(__dir__, '..', 'days', pad(day))
+end
+
+def time_est
+  est = TZInfo::Timezone.get('US/Eastern')
+
+  est.to_local(Time.now)
 end
 
 ##
@@ -59,13 +66,24 @@ class AoCCLI < Thor
   desc 'get [DAY]', 'Get input for a day'
   def get(day = nil)
     ensure_token
-    @year = options[:year] || Date.today.year
-    day ||= Date.today.day
+    @year = options[:year] || time_est.year
+    day ||= time_est.day
 
+    path = File.join(folder_path(day), 'input.txt')
+
+    puts "fetching input for #{@year}, day #{day}..."
     input = AoCAPI.input(@token, @year, day)
-    File.write(File.join(folder_path(day), 'input.txt'), input)
+    File.write(path, input)
+    puts "input saved to #{path}"
+  end
+
+  desc 'curday', 'Prints the current day in EST'
+  def curday
+    puts time_est.day
   end
 end
+
+RestClient.log = STDERR if $DEBUG
 
 AoCCLI.start(ARGV)
 
