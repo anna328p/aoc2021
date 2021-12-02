@@ -11,16 +11,18 @@ infile = ARGV[0] || 'input.txt'
 input = File.readlines(infile).map { |line| a, b = line.split; [a, b.to_i] }
 
 x = 0
+aim = 0
 depth = 0
 
 input.each do |op, val|
   case op
   when 'forward'
     x += val
+    depth += aim * val
   when 'down'
-    depth += val
+    aim += val
   when 'up'
-    depth -= val
+    aim -= val
   end
 end
 
