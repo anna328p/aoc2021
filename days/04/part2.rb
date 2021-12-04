@@ -19,12 +19,19 @@ def matches?(so_far, board)
 end
 
 so_far = []
-res = nil
+winners = []
+scores = []
+
 numbers.each do |num|
   so_far << num
-  res = boards.find { matches?(so_far, _1) }
-  break if res
+  this_round = boards.filter { matches?(so_far, _1) }
+
+  this_round.each do |board|
+    scores << (board.flatten - so_far).sum * so_far.last
+  end
+
+  boards -= this_round
+  winners += this_round
 end
 
-out = (res.flatten - so_far).sum * so_far.last
-puts out
+puts scores.last
