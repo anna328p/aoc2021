@@ -19,6 +19,8 @@ end
 horiz = input.filter { |p1, p2| p1.y == p2.y }.map { |p| p.sort_by(&:x) }
 vert = input.filter { |p1, p2| p1.x == p2.x }.map { |p| p.sort_by(&:y) }
 
+diag = input.filter { |p1, p2| p1.x != p2.x && p1.y != p2.y }.map { |p| p.sort_by(&:x) }
+
 xmax = input.max_by { |p1, p2| [p1.x, p2.x].max }.map(&:x).max
 ymax = input.max_by { |p1, p2| [p1.y, p2.y].max }.map(&:y).max
 
@@ -33,6 +35,14 @@ end
 vert.each do |p1, p2|
   (p1.y..p2.y).each do |y|
     field[y][p1.x] += 1
+  end
+end
+
+diag.each do |s1, s2|
+  dir = s2.y <=> s1.y
+
+  (s1.x..s2.x).each do |x|
+    field[s1.y + dir * (x - s1.x)][x] += 1
   end
 end
 
