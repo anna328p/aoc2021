@@ -11,4 +11,4 @@ input = File.read(infile).split(',').map(&:to_i)
 
 max_pos = input.max
 
-puts (0..max_pos).map { |x| input.map { n = (x - _1).abs }.sum }.min
+puts (0..max_pos).map { |x| input.map { n = (x - _1).abs; (n * (n + 1)) / 2 }.sum }.min
