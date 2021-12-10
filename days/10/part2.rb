@@ -4,38 +4,50 @@
 
 # Advent of Code 2021
 # Day 10
-# Part 1
+# Part 2
 
 require 'aoc'
 
 infile = ARGV[0] || 'input.txt'
 input = File.readlines(infile).map { |line| line.strip.chars }
-pp input.first(3)
 
+def median(array)
+  return nil if array.empty?
+
+  sorted = array.sort
+  len = sorted.length
+  sorted[(len - 1) / 2]
+end
 
 def check_delimiter_matches(chars)
   stack = []
 
   delims = { '[' => ']', '{' => '}', '<' => '>', '(' => ')' }
 
-  values = { ')' => 3, ']' => 57, '}' => 1197, '>' => 25137 }
+  values = { ')' => 1, ']' => 2, '}' => 3, '>' => 4 }
 
   chars.each do |char|
     if delims.keys.include?(char)
       stack.push(char)
     elsif delims.values.include?(char)
-      if delims[stack.last] == char
-        stack.pop
-      else
-        return values[char]
-      end
+      return false unless delims[stack.last] == char
+
+      stack.pop
     else
       return false
     end
   end
 
-  return false
+  vals = stack.reverse.map { |char| delims[char] }
+  
+  points = 0
+  vals.each do |val|
+    points *= 5
+    points += values[val]
+  end
+
+  points
 end
 
 
-p input.filter_map { |chars| check_delimiter_matches(chars) }.sum
+p median(input.filter_map { |chars| check_delimiter_matches(chars) })
