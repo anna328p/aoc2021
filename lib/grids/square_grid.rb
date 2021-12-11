@@ -21,6 +21,8 @@ module Grids
   # Represents a square grid
   # Compatible with the A* algorithm
   class SquareGrid < AbstractNodeSet
+    include Enumerable
+
     def initialize(array)
       nodes = Array.new(array.size) { Array.new(array.first.size) }
 
@@ -31,6 +33,14 @@ module Grids
       end
 
       super(nodes)
+    end
+
+    def each
+      nodes.each_with_index do |row, y|
+        row.each_with_index do |node, x|
+          yield node, x, y
+        end
+      end
     end
 
     # rubocop: disable Naming/MethodParameterName
