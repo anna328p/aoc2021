@@ -15,10 +15,6 @@ input = File.readlines(infile).map { |line| line.strip.chars.map { Value.new(_1.
 
 grid = Grids::SquareGrid.new(input)
 
-n_steps = 100
-
-$total_flashes = 0
-
 def flash(grid, node)
   return unless node.data.energy > 9 && node.data.flashed == false
 
@@ -30,11 +26,9 @@ def flash(grid, node)
     n.data.energy += 1
     flash(grid, n)
   end
-
-  $total_flashes += 1
 end
 
-n_steps.times do
+1.step do |n|
   grid.nodes.each do |row|
     row.each do |node|
       node.data.energy += 1
@@ -55,6 +49,9 @@ n_steps.times do
       end
     end
   end
-end
 
-puts $total_flashes
+  if grid.nodes.all? { |row| row.all? { |node| node.data.energy.zero? } }
+    puts n
+    break
+  end
+end
