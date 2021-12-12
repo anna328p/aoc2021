@@ -4,7 +4,7 @@
 
 # Advent of Code 2021
 # Day 12
-# Part 1
+# Part 2
 
 require 'aoc'
 
@@ -27,15 +27,6 @@ class CaveGraph < Grids::AbstractNodeSet
   def neighbors(node)
     @edges.select { |a, b| a == node || b == node }.map { |a, b| a == node ? b : a }
   end
-
-  def weight(a, b)
-    # check if b is a small node
-    if b.downcase == b
-      return Float::INFINITY
-    else
-      return 1
-    end
-  end
 end
 
 infile = ARGV[0] || 'input.txt'
@@ -43,7 +34,13 @@ input = File.readlines(infile).map { |line| line.strip.split('-') }
 
 graph = CaveGraph.new(input)
 
-def search(graph, start, target, visited = [], indent = '')
+def small_cave_twice(visited, cave)
+  small_caves = visited.filter { _1.downcase == _1 }.tally
+  small_caves[cave]&.then { _1 >= 1 } && small_caves.values.any? { _1 >= 2 }
+end
+
+def search(graph, start, target, visited = [], indent = '', orig_start = nil)
+  orig_start ||= start
   visited = visited.dup
 
   visited << start
@@ -54,14 +51,16 @@ def search(graph, start, target, visited = [], indent = '')
     if node == target
       paths << visited + [node]
       next
-    elsif visited.include?(node) && node.downcase == node
+    elsif node == orig_start
+      next
+    elsif node.downcase == node && small_cave_twice(visited, node)
       next
     end
 
-    paths += search(graph, node, target, visited, indent + '  ')
+    paths += search(graph, node, target, visited, indent + '  ', orig_start)
   end
 
   paths
 end
 
-pp search(graph, 'start', 'end').count
+puts search(graph, 'start', 'end').count
