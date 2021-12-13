@@ -4,8 +4,7 @@
 
 # Advent of Code 2021
 # Day 13
-# Part 1
-
+# Part 2
 
 infile = ARGV[0] || 'input.txt'
 input = File.read(infile)
@@ -59,7 +58,7 @@ def fold_x(field, line)
   left
 end
 
-folds.first(1).each do |dir, coord|
+folds.each do |dir, coord|
   case dir
   when 'x'
     field = fold_x(field, coord)
@@ -68,4 +67,4 @@ folds.first(1).each do |dir, coord|
   end
 end
 
-puts field.flatten.count('#')
+field.map { _1.join }.each { puts _1 }
