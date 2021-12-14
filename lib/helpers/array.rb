@@ -15,4 +15,8 @@ class Array
       (sorted[mid - 1] + sorted[mid]) / 2.0
     end
   end
+
+  def swizzle(indices)
+    indices.map { self[_1] }
+  end
 end
