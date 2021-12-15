@@ -12,7 +12,7 @@ module Grids
       @data = data
     end
     # rubocop: enable Naming/MethodParameterName
-    
+
     def inspect
       "(#{x}, #{y}): #{data}"
     end
@@ -90,11 +90,11 @@ module Grids
     # rubocop: enable Metrics/MethodLength
   end
 
-  euclidean_heuristic = -> (node, goal) {
-    Math.sqrt((node.x - goal.x) ** 2 + (node.y - goal.y) ** 2)
-  }
+  EUCLIDEAN_HEURISTIC = lambda do |node, goal|
+    Math.sqrt((node.x - goal.x)**2 + (node.y - goal.y)**2)
+  end
 
-  manhattan_heuristic = -> (node, goal) {
+  MANHATTAN_HEURISTIC = lambda do |node, goal|
     (node.x - goal.x).abs + (node.y - goal.y).abs
-  }
+  end
 end
