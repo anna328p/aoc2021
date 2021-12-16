@@ -72,12 +72,25 @@ def parse_packet(bits)
   packet
 end
 
-def add_up_versions(packet)
-  if packet.subpackets
-    packet.version + packet.subpackets.map { add_up_versions(_1) }.compact.sum
-  else
-    packet.version
+def eval(packet)
+  case packet.type_id
+  when TYPES[:sum]
+    packet.subpackets.map { |p| eval(p) }.sum
+  when TYPES[:product]
+    packet.subpackets.map { |p| eval(p) }.reduce(:*)
+  when TYPES[:minimum]
+    packet.subpackets.map { |p| eval(p) }.min
+  when TYPES[:maximum]
+    packet.subpackets.map { |p| eval(p) }.max
+  when TYPES[:literal]
+    packet.value
+  when TYPES[:greater_than]
+    eval(packet.subpackets[0]) > eval(packet.subpackets[1]) ? 1 : 0
+  when TYPES[:less_than]
+    eval(packet.subpackets[0]) < eval(packet.subpackets[1]) ? 1 : 0
+  when TYPES[:equal_to]
+    eval(packet.subpackets[0]) == eval(packet.subpackets[1]) ? 1 : 0
   end
 end
 
-pp add_up_versions(parse_packet(input))
+pp eval(parse_packet(input))
