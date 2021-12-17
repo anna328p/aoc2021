@@ -4,7 +4,7 @@
 
 # Advent of Code 2021
 # Day 17
-# Part 1
+# Part 2
 
 
 infile = ARGV[0] || 'input.txt'
@@ -38,21 +38,16 @@ def check_collision(init_vel, target)
   end
 end
 
-def find_peak(log)
-  log.map(&:y).max
-end
-
-# find the initial velocity that will collide with the target area
-# and has the highest peak y value 
-def find_max_peak_y(target)
-  peaks = []
-  (1..500).each do |dy|
+def find_collisions(target)
+  collisions = []
+  (-200..300).each do |dy|
     (1..300).each do |dx|
-      collision, log = check_collision(CoordPair.new(dx, dy), target)
-      peaks << find_peak(log) if collision
+      vel = CoordPair.new(dx, dy)
+      collision, log = check_collision(vel.dup, target)
+      collisions << vel.dup if collision
     end
   end
-  peaks.max
+  collisions.count
 end
 
-puts find_max_peak_y(target_area)
+puts find_collisions(target_area)
